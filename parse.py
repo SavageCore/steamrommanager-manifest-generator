@@ -33,7 +33,7 @@ for directory in directories:
     # Get the game's title
     title = directory
     # Get the game's target which is the full path to the game's executable
-    targets = fnmatch.filter(os.listdir(directory), '*.exe')
+    targets = fnmatch.filter(os.listdir(os.path.join(config_db.get('games_dir'), directory)), '*.exe')
     # If more than one target, ask the user to select one otherwise use the first one
     if len(targets) > 1:
         cached_target = targets_db.get(title)
