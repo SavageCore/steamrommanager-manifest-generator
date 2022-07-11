@@ -36,19 +36,22 @@ if not config_db.get('games_dir') and not config_db.get('skip_games_dir'):
     config_db.set('games_dir', games_dir)
     config_db.set('skip_games_dir', True)
 
+itch_games_dir = config_db.get('itch_games_dir')
+games_dir = config_db.get('games_dir')
 manifest_path = os.path.join('manifests', 'manifest.json')
 manifests = []
 
-print('Parsing each Itch game in ' + config_db.get('itch_games_dir'))
+print('Parsing each Itch game in ' + itch_games_dir)
 
 # Get all directories in itch_games_dir
-itch_directories = [d for d in os.listdir(config_db.get('itch_games_dir')) if os.path.isdir(os.path.join(config_db.get('itch_games_dir'), d))]
+itch_directories = [d for d in os.listdir(itch_games_dir)
+if os.path.isdir(os.path.join(itch_games_dir, d))]
 # For each itch game directory, extract and parse the json file within .itch/receipt.json.gz
 # Use alive-progress to show progress bar as we parse each game
 with alive_bar(len(itch_directories)) as bar:
     for itch_dir in itch_directories:
         # Get the receipt.json.gz file
-        receipt_file = os.path.join(config_db.get('itch_games_dir'), itch_dir, '.itch', 'receipt.json.gz')
+        receipt_file = os.path.join(itch_games_dir, itch_dir, '.itch', 'receipt.json.gz')
         # If the receipt file exists, parse it
         if os.path.isfile(receipt_file):
             # Extract the receipt.json.gz file
@@ -59,13 +62,17 @@ with alive_bar(len(itch_directories)) as bar:
                 platforms = receipt.get('game').get('platforms')
                 # If receipt.json.gz.json does not contain Linux but does contain Windows, add it to the manifest
                 if 'linux' not in platforms and 'windows' in platforms:
-                    # Get all subdirectories in itch_dir
-                    itch_subdirectories = [d for d in os.listdir(os.path.join(config_db.get('itch_games_dir'), itch_dir)) if os.path.isdir(os.path.join(config_db.get('itch_games_dir'), itch_dir, d))]
-                    # Remove '.itch' folder from list of subdirectories
-                    itch_subdirectories.remove('.itch')
-                    fullPath = os.path.abspath(os.path.join(config_db.get('itch_games_dir'), itch_dir, itch_subdirectories[0]))
                     # Find the games executable
-                    targets = fnmatch.filter(os.listdir(os.path.join(config_db.get('itch_games_dir'), itch_dir, itch_subdirectories[0])), '*.exe')
+                    first_file_entry = receipt.get('files')[0]
+                    first_file_entry_path = os.path.join(itch_games_dir, itch_dir, first_file_entry)
+                    base_path = os.path.join(itch_games_dir, itch_dir)
+                    # If first entry of receipt.files is a directory, then the executable is within that directory
+                    if os.path.isdir(first_file_entry_path):
+                        targets = fnmatch.filter(os.listdir(first_file_entry_path), '*.exe')
+                        fullPath = os.path.abspath(first_file_entry_path)
+                    else:
+                        targets = fnmatch.filter(os.listdir(base_path), '*.exe')
+                        fullPath = os.path.abspath(base_path)
                     # If more than one target, ask the user to select one otherwise use the first one
                     if len(targets) > 1:
                         cached_target = targets_db.get(title)
@@ -97,20 +104,20 @@ with alive_bar(len(itch_directories)) as bar:
         bar()
 
 if not config_db.get('skip_games_dir'):
-    print('Parsing each Windows game in ' + config_db.get('games_dir'))
+    print('Parsing each Windows game in ' + games_dir)
 
     # Get all directories in games_dir
-    game_directories = [d for d in os.listdir(config_db.get('games_dir')) if os.path.isdir(os.path.join(config_db.get('games_dir'), d))]
+    game_directories = [d for d in os.listdir(games_dir) if os.path.isdir(os.path.join(games_dir, d))]
 
     # Create a manifest entry for each Windows game
     with alive_bar(len(game_directories)) as bar:
         for directory in game_directories:
             # Get full path of directory
-            fullPath = os.path.abspath(os.path.join(config_db.get('games_dir'), directory))
+            fullPath = os.path.abspath(os.path.join(games_dir, directory))
             # Get the game's title
             title = directory
             # Get the game's target which is the full path to the game's executable
-            targets = fnmatch.filter(os.listdir(os.path.join(config_db.get('games_dir'), directory)), '*.exe')
+            targets = fnmatch.filter(os.listdir(os.path.join(games_dir, directory)), '*.exe')
             # If more than one target, ask the user to select one otherwise use the first one
             if len(targets) > 1:
                 cached_target = targets_db.get(title)
