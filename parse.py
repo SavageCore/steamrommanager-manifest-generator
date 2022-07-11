@@ -18,7 +18,7 @@ targets_db = pickledb.load('targets.db', True)
 
 # Ask user to select games directory if not in config file
 if not config_db.get('games_dir'):
-    games_dir = askdirectory(title='Select folder containing all itch games')
+    games_dir = askdirectory(title='Select folder containing all Windows games')
     # Save games_dir to config file
     config_db.set('games_dir', games_dir)
 
