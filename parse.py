@@ -60,7 +60,7 @@ for directory in directories:
     manifests.append(manifest_entry)
 
 # For each manifest entry, write it to the manifest file
-with open('manifest.json', 'w') as manifestFile:
+with open(os.path.join(config_db.get('games_dir'), 'manifest.json'), 'w') as manifestFile:
     manifestFile.write("[\n")
     for manifest_entry in manifests:
         # If the last entry
