@@ -1,5 +1,5 @@
 # steamrommanager-manifest-generator
-Python script to generate [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) manifest file from a directory of Windows games. Useful on Steam Deck to parse manually downloaded [itch.io](https://itch.io) games.
+Python script to generate a [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) manifest file from a directory of Windows games. Useful on Steam Deck to parse manually downloaded [itch.io](https://itch.io) games.
 
 # How to
 
