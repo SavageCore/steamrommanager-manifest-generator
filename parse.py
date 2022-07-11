@@ -29,7 +29,7 @@ manifests = []
 # Create a manifest entry for each game
 for directory in directories:
     # Get full path of directory
-    fullPath = os.path.abspath(directory)
+    fullPath = os.path.abspath(os.path.join(config_db.get('games_dir'), directory))
     # Get the game's title
     title = directory
     # Get the game's target which is the full path to the game's executable
