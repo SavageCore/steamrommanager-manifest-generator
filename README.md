@@ -54,4 +54,4 @@ chmod +x ~/.local/bin/wine
 sed -i.bak ~/.local/share/applications/io.itch.itch.desktop -e 's!^Exec=\(/home/deck/.itch/itch.*\)!Exec=sh -c "PATH=/home/deck/.local/bin:$PATH \1"!'
 ```
 
-Once that's done create a new parser within [SRM](https://steamgriddb.github.io/steam-rom-manager/) of type `Manual` and set the `Manifests Directory` to `/home/deck/steamrommanager-manifest-generator/manifests`
+Once that's done create a new parser within [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) of type `Manual` and set the `Manifests Directory` to `/home/deck/steamrommanager-manifest-generator/manifests`
