@@ -1,11 +1,11 @@
 # steamrommanager-manifest-generator
 Python script to generate a [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) manifest file from Windows games installed with [itch.io](https://itch.io) on Linux and optionally a second directory of Windows games from anywhere!
 
-# How to
+# Setup
 
 Firstly you'll want to create a folder to store all your Windows games. This is optional if you are only parsing games installed from the [itch.io](https://itch.io) client. When the script asks for the Windows directory just click cancel.
 ```
-mkdir -p /home/deck/Games/Windows
+mkdir -p ~/Games/Windows
 ```
 Now download and extract all your games to this folder making sure to give each games folder a nice name [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) can parse.
 
@@ -18,10 +18,10 @@ python -m ensurepip --upgrade
 And finally clone, install and run the script.
 
 ```
-cd /home/deck
+cd ~
 git clone https://github.com/SavageCore/steamrommanager-manifest-generator.git
 cd steamrommanager-manifest-generator
-/home/deck/.local/bin/pip3 install -r requirements.txt
+~/.local/bin/pip3 install -r requirements.txt
 python parse.py
 ```
 
@@ -29,9 +29,9 @@ You will be asked for the [itch.io](https://itch.io) apps directory which should
 
 # Upgrading
 ```
-cd /home/deck/steamrommanager-manifest-generator
+cd ~/steamrommanager-manifest-generator
 git pull
-/home/deck/.local/bin/pip3 install -r requirements.txt
+~/.local/bin/pip3 install -r requirements.txt
 ```
 
 # On Steam Deck
@@ -55,7 +55,7 @@ EOF
 chmod +x ~/.local/bin/wine
 ```
 ```
-sed -i.bak ~/.local/share/applications/io.itch.itch.desktop -e 's!^Exec=\(/home/deck/.itch/itch.*\)!Exec=sh -c "PATH=/home/deck/.local/bin:$PATH \1"!'
+sed -i.bak ~/.local/share/applications/io.itch.itch.desktop -e 's!^Exec=\(~/.itch/itch.*\)!Exec=sh -c "PATH=~/.local/bin:$PATH \1"!'
 ```
 
-Once that's done create a new parser within [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) of type `Manual` and set the `Manifests Directory` to `/home/deck/steamrommanager-manifest-generator/manifests`
+Once that's done create a new parser within [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) of type `Manual` and set the `Manifests Directory` to `~/steamrommanager-manifest-generator/manifests`
