@@ -24,11 +24,14 @@ script_path = os.path.abspath(__file__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def menu():
+    desktop_shortcut_prompt = 'Create'
+    if os.path.isfile(os.path.join(desktop_path, 'steamrommanager-manifest-generator.desktop')):
+        desktop_shortcut_prompt = 'Remove'
     print('\n')
     print(pyfiglet.figlet_format('SRM-MG',font='doom'))
     print('1. Run')
     print('2. Update')
-    print('3. Create desktop shortcut')
+    print('3. ' + desktop_shortcut_prompt + ' desktop shortcut')
     print('4. Quit')
     print('\n')
     choice = input('Enter your choice: ')
@@ -40,8 +43,10 @@ def menu():
         update()
     elif choice == '3':
         os.system('clear')
-        create_desktop_shortcut()
-        sleep(3)
+        if os.path.isfile(os.path.join(desktop_path, 'steamrommanager-manifest-generator.desktop')):
+            remove_desktop_shortcut()
+        else:
+            create_desktop_shortcut()
         os.system('clear')
         menu()
     elif choice == '4':
@@ -218,6 +223,10 @@ def create_desktop_shortcut():
         # Print the .desktop file path
         print('\n')
         print('Created .desktop file at ' + os.path.abspath(desktop_file_path))
+
+def remove_desktop_shortcut():
+    desktop_file_path = os.path.join(desktop_path, 'steamrommanager-manifest-generator.desktop')
+    os.remove(desktop_file_path)
 
 # Define update function to update the script by git pull and relaunch
 def update():
