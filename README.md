@@ -1,5 +1,5 @@
 # steamrommanager-manifest-generator
-Python script to generate a [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) manifest file from Windows games installed with [itch.io](https://itch.io) and optionally a second directory of Windows games from anywhere!
+Python script to generate a [Steam Rom Manager](https://steamgriddb.github.io/steam-rom-manager/) manifest file from Windows games installed with [itch.io](https://itch.io) on Linux and optionally a second directory of Windows games from anywhere!
 
 # How to
 
