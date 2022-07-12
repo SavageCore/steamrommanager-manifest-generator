@@ -19,13 +19,14 @@ config_db = pickledb.load('config.db', True)
 targets_db = pickledb.load('targets.db', True)
 config_handler.set_global(spinner='crab')
 skip_games_dir = False
+itch_path = os.path.join(os.path.expanduser('~'), '.config/itch/apps')
 # Get current users desktop path
 desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
 script_path = os.path.abspath(__file__)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 if not config_db.get('itch_games_dir'):
-    itch_games_dir = askdirectory(initialdir='/home/deck/.config/itch/apps', title='Select itch apps folder')
+    itch_games_dir = askdirectory(initialdir=itch_path, title='Select itch apps folder')
     # Save games_dir to config file
     config_db.set('itch_games_dir', itch_games_dir)
 
