@@ -220,6 +220,8 @@ def create_desktop_shortcut():
         desktop_file.write('Type=Application\n')
         desktop_file.write('Categories=Game;Utility\n')
         desktop_file.close()
+        # Set the desktop file's permissions to allow execution
+        os.chmod(desktop_file_path, 0o755)
         # Print the .desktop file path
         print('\n')
         print('Created .desktop file at ' + os.path.abspath(desktop_file_path))
