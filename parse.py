@@ -1,12 +1,11 @@
 import os
 import fnmatch
-import subprocess
 import sys
-import time
+from time import sleep
 import pickledb
 import json
 from tkinter.filedialog import askdirectory
-from alive_progress import alive_bar, alive_it, config_handler
+from alive_progress import alive_bar, config_handler
 # Sample manifest file:
 # {
 #     "title": "Long Gone Days",
@@ -20,6 +19,10 @@ config_db = pickledb.load('config.db', True)
 targets_db = pickledb.load('targets.db', True)
 config_handler.set_global(spinner='crab')
 skip_games_dir = False
+# Get current users desktop path
+desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+script_path = os.path.abspath(__file__)
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 if not config_db.get('itch_games_dir'):
     itch_games_dir = askdirectory(initialdir='/home/deck/.config/itch/apps', title='Select itch apps folder')
@@ -170,3 +173,39 @@ for manifest_entry in manifests:
     # Load json from manifest_entry
     manifest_dict = json.loads(manifest_entry)
     print('* ' + manifest_dict['title'])
+
+# If first run of this script, ask the user if they want to create a .desktop file to launch this script
+if config_db.get('first_run'):
+    # Set the first_run config to False
+    config_db.set('first_run', False)
+    print()
+    print('Would you like to create a .desktop file to launch this script?')
+    print('(y/n)')
+    create_desktop_file = input()
+    if create_desktop_file == 'y':
+        # Create the .desktop file
+        desktop_file_path = os.path.join(desktop_path, 'steamrommanager-manifest-generator.desktop')
+        desktop_file = open(desktop_file_path, 'w')
+        desktop_file.write('[Desktop Entry]\n')
+        desktop_file.write('Name=steamrommanager-manifest-generator\n')
+        desktop_file.write('Comment=Parse games with steamrommanager-manifest-generator\n')
+        desktop_file.write('Exec=python ' + script_path + '\n')
+        desktop_file.write('Path=' + script_dir + '\n')
+        desktop_file.write('Icon=steamdeck-gaming-return\n')
+        desktop_file.write('Terminal=true\n')
+        desktop_file.write('Type=Application\n')
+        desktop_file.write('Categories=Game;Utility\n')
+        desktop_file.close()
+        # Print the .desktop file path
+        print()
+        print('Created .desktop file at ' + os.path.abspath(desktop_file_path))
+
+timeout = 15
+print()
+print('Closing in ' + str(timeout) + ' seconds... CTRL+C to exit now')
+try:
+    for i in range(0,timeout):
+        sleep(1)
+    sys.exit()
+except KeyboardInterrupt:
+    sys.exit()
