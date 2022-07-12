@@ -13,6 +13,10 @@ from alive_progress import alive_bar, config_handler
 #     "startIn": "/home/deck/Games/Itch/Long Gone Days",
 #     "launch_options": ""
 # },
+first_run = False
+# If the config file doesn't exist set first run to True
+if not os.path.isfile('config.db'):
+    first_run = True
 # Load config file
 config_db = pickledb.load('config.db', True)
 # Load local cache of game targets
@@ -176,9 +180,7 @@ for manifest_entry in manifests:
     print('* ' + manifest_dict['title'])
 
 # If first run of this script, ask the user if they want to create a .desktop file to launch this script
-if config_db.get('first_run'):
-    # Set the first_run config to False
-    config_db.set('first_run', False)
+if first_run:
     print()
     print('Would you like to create a .desktop file to launch this script?')
     print('(y/n)')
