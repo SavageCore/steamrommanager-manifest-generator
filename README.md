@@ -36,7 +36,7 @@ git pull
 
 # On Steam Deck
 
-For this to work on Steam Deck we must trick the [itch.io](https://itch.io) client into thinking we have Wine and thus offering the choice to install Windows games. Run the following commands:
+For this to work on Steam Deck we must trick the [itch.io](https://itch.io) client into thinking we have non-flatpak Wine and thus offering the choice to install Windows games. Run the following commands:
 
 ```
 flatpak install -y org.winehq.Wine
