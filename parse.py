@@ -83,62 +83,64 @@ def run():
     if os.path.isdir(os.path.join(itch_games_dir, d))]
     # For each itch game directory, extract and parse the json file within .itch/receipt.json.gz
     # Use alive-progress to show progress bar as we parse each game
-    with alive_bar(len(itch_directories)) as bar:
-        for itch_dir in itch_directories:
-            # Get the receipt.json.gz file
-            receipt_file = os.path.join(itch_games_dir, itch_dir, '.itch', 'receipt.json.gz')
-            # If the receipt file exists, parse it
-            if os.path.isfile(receipt_file):
-                # Extract the receipt.json.gz file
-                os.system('gunzip -c ' + receipt_file + ' > ' + receipt_file + '.json')
-                with open(receipt_file + '.json', 'r') as f:
-                    receipt = json.load(f)
-                    title = receipt.get('game').get('title')
-                    platforms = receipt.get('game').get('platforms')
-                    # If receipt.json.gz.json does not contain Linux but does contain Windows, add it to the manifest
-                    if 'linux' not in platforms and 'windows' in platforms:
-                        # Find the games executable
-                        first_file_entry = receipt.get('files')[0]
-                        first_file_entry_path = os.path.join(itch_games_dir, itch_dir, first_file_entry)
-                        base_path = os.path.join(itch_games_dir, itch_dir)
-                        # If first entry of receipt.files is a directory, then the executable is within that directory
-                        if os.path.isdir(first_file_entry_path):
-                            targets = fnmatch.filter(os.listdir(first_file_entry_path), '*.exe')
-                            fullPath = os.path.abspath(first_file_entry_path)
+    # with alive_bar(len(itch_directories)) as bar:
+    for itch_dir in itch_directories:
+        # Get the receipt.json.gz file
+        receipt_file = os.path.join(itch_games_dir, itch_dir, '.itch', 'receipt.json.gz')
+        # If the receipt file exists, parse it
+        if os.path.isfile(receipt_file):
+            # Extract the receipt.json.gz file
+            os.system('gunzip -c ' + receipt_file + ' > ' + receipt_file + '.json')
+            with open(receipt_file + '.json', 'r') as f:
+                receipt = json.load(f)
+                title = receipt.get('game').get('title')
+                platforms = receipt.get('game').get('platforms')
+                # If receipt.json.gz.json does not contain Linux but does contain Windows, add it to the manifest
+                if 'linux' not in platforms and 'windows' in platforms:
+                    # Find the games executable
+                    first_file_entry = receipt.get('files')[0]
+                    # Split first_file_entry on '/' incase it's not the base dir
+                    first_file_entry_split = first_file_entry.split('/')
+                    first_file_entry_path = os.path.join(itch_games_dir, itch_dir, first_file_entry_split[0])
+                    base_path = os.path.join(itch_games_dir, itch_dir)
+                    # If first entry of receipt.files is a directory, then the executable is within that directory
+                    if os.path.isdir(first_file_entry_path):
+                        targets = fnmatch.filter(os.listdir(first_file_entry_path), '*.exe')
+                        fullPath = os.path.abspath(first_file_entry_path)
+                    else:
+                        targets = fnmatch.filter(os.listdir(base_path), '*.exe')
+                        fullPath = os.path.abspath(base_path)
+                    # If more than one target, ask the user to select one otherwise use the first one
+                    if len(targets) == 0:
+                        continue
+                    if len(targets) > 1:
+                        cached_target = targets_db.get(title)
+                        if cached_target:
+                            target = cached_target
                         else:
-                            targets = fnmatch.filter(os.listdir(base_path), '*.exe')
-                            fullPath = os.path.abspath(base_path)
-                        # If more than one target, ask the user to select one otherwise use the first one
-                        if len(targets) == 0:
-                            continue
-                        if len(targets) > 1:
-                            cached_target = targets_db.get(title)
-                            if cached_target:
-                                target = cached_target
-                            else:
-                                print('\n')
-                                print('Multiple potential game exes found for ' + title)
-                                for i in range(len(targets)):
-                                    print(str(i) + ': ' + targets[i])
-                                target = targets[int(input('Select the game exe: '))]
-                                targets_db.set(title, target)
-                        else:
-                            target = targets[0]
-                        target = os.path.join(fullPath, target)
+                            print('\n')
+                            print('Multiple potential game exes found for ' + title)
+                            for i in range(len(targets)):
+                                print(str(i) + ': ' + targets[i])
+                            target = targets[int(input('Select the game exe: '))]
+                            targets_db.set(title, target)
+                    else:
+                        target = targets[0]
+                    target = os.path.join(fullPath, target)
 
-                        # Get the game's startIn
-                        startIn = os.path.join(fullPath)
-                        # Set the game's launch_options
-                        launch_options = ''
-                        # Create the manifest entry
-                        manifest_entry = '{{"title": "{}", "target": "{}", "startIn": "{}", "launch_options": "{}"}},'.format(
-                            title, target, startIn, launch_options)
-                        # Add manifest entry to list
-                        manifests.append(manifest_entry)
-                        f.close()
-                # Delete receipt.json.gz.json
-                os.remove(receipt_file + '.json')
-            bar()
+                    # Get the game's startIn
+                    startIn = os.path.join(fullPath)
+                    # Set the game's launch_options
+                    launch_options = ''
+                    # Create the manifest entry
+                    manifest_entry = '{{"title": "{}", "target": "{}", "startIn": "{}", "launch_options": "{}"}},'.format(
+                        title, target, startIn, launch_options)
+                    # Add manifest entry to list
+                    manifests.append(manifest_entry)
+                    f.close()
+            # Delete receipt.json.gz.json
+            os.remove(receipt_file + '.json')
+            # bar()
 
     if not config_db.get('skip_games_dir'):
         print('Parsing each Windows game in ' + games_dir)
