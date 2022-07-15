@@ -109,6 +109,8 @@ def run():
                             targets = fnmatch.filter(os.listdir(base_path), '*.exe')
                             fullPath = os.path.abspath(base_path)
                         # If more than one target, ask the user to select one otherwise use the first one
+                        if len(targets) == 0:
+                            continue
                         if len(targets) > 1:
                             cached_target = targets_db.get(title)
                             if cached_target:
